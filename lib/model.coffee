@@ -515,6 +515,9 @@ doc_id_to_link = (id) ->
       result = renameObject "puzzles", {args..., who: @userId}
       # rename google drive folder
       renameDriveFolder args.name, drive, spreadsheet, doc if result and drive?
+
+      # todo: rename discord
+
       return result
     deletePuzzle: (pid) ->
       check @userId, NonEmptyString
