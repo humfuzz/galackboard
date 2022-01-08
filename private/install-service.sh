@@ -1,20 +1,4 @@
-#!/bin/bash
-
 scriptroot=$(readlink -f $(dirname $0))
-
-if [ "$(findmnt -T /var/lib/mongodb -n -o fstype)" != "xfs" ] ; then
-  echo >&2 "MongoDB will complain if /var/lib/mongodb is a file system other than xfs."
-  echo >&2 "If you have unallocated disk, consider making a partition now."
-  echo >&2 "Stop to do this now, or continue?"
-  select stopgo in "Stop" "Continue"; do
-    if [ "$stopgo" = "Stop" ]
-    then exit
-    elif [ "$stopgo" = "Continue" ]
-    then break
-    fi
-  done
-fi
-
 domainname=$1
 while [ -z "$domainname" ] ; do
   read -p "Need a domain name for the site: " domainname
@@ -22,38 +6,7 @@ done
 
 set -e
 
-cd $HOME
-curl https://install.meteor.com/ | sh
-
-# Set up apt
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
-sudo bash -c 'echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list'
-curl -sSL https://deb.nodesource.com/setup_10.x | sudo bash -
-sudo apt-get update
-sudo apt-get install -y mongodb-org nodejs software-properties-common
-
-# This will help us template some files
-sudo npm install -g handlebars-cmd
-cd $scriptroot/..
-
-# Build the bundle, then install it.
-meteor npm install
-sudo mkdir /opt/codex
-sudo chmod a+rwx /opt/codex
-meteor build --directory /opt/codex # this command fails?
 cd /opt/codex/bundle/programs/server
-sudo npm install
-
-# Copy the static files
-sudo cp -a $scriptroot/installfiles/* /
-sudo systemctl daemon-reload
-node_path=$(npm root -g --no-update-notifier)
-
-handlebars < $scriptroot/installtemplates/etc/codex-common.env.handlebars --domainname "$domainname" | sudo bash -c "cat > /etc/codex-common.env"
-handlebars < $scriptroot/installtemplates/etc/codex-batch.env.handlebars --node_path "$node_path" | sudo bash -c "cat > /etc/codex-batch.env"
-sudo vim /etc/codex-common.env
-sudo chmod 600 /etc/codex-batch.env
-sudo vim /etc/codex-batch.env
 
 # Figure out how many service we're starting.
 # On a single core machine, we start a single task at port 28000 that does
@@ -83,7 +36,6 @@ sudo mongo --eval 'rs.initiate({_id: "meteor", members: [{_id: 0, host: "127.0.0
 
 sudo systemctl enable codex-batch.service
   
-# deprecated, use standard package: sudo add-apt-repository -y ppa:certbot/certbot
 sudo apt-get update
 sudo apt-get install -y certbot
 
@@ -100,3 +52,4 @@ sudo rm /etc/nginx/sites-enabled/default
 sudo systemctl enable codex.target
 sudo systemctl start codex.target
 sudo systemctl reload nginx.service
+
