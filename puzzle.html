@@ -149,7 +149,16 @@
     <div class="bb-splitter-handle" style="bottom: {{vsize}}px"></div>
     {{/unless}}
     <div class="bb-bottom-right-content" style="{{#unless currentViewIs "info"}}height: {{vsize}}px{{/unless}}">{{! start bottom right splitter }}
-      {{> embedded_chat}}
+
+      <!-- TODO: insert channel-id from puzzle metadata -->
+      <!-- TODO: inject server-id from meteor settings -->
+      {{> discord 
+        server="929949526230446090"
+        channel="929950938549084210"
+      }}
+      <!-- {{> embedded_chat}} -->
+
+      <!-- TODO: replace with open in discord:// link -->
       <div class="bb-chat-pop-out {{#if currentViewIs "info"}}in-margin{{/if}}">
         <a href="/chat/puzzles/{{puzzle._id}}" class="chat-link bb-pop-out"
            target="chat{{puzzle._id}}"><i class="fas fa-expand-arrows-alt"></i>
