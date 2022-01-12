@@ -151,9 +151,11 @@ class DiscordBot
       channel.setName(channel.name.slice(solvePrefix.length))
     channel.send("Puzzle has been marked unsolved.")
 
-share.discord = new DiscordBot
-console.log 'shared the discord bot'
+Meteor.startup ->
 
-client.login token
-console.log 'logged in'
+  share.discord = new DiscordBot
+  console.log 'shared the discord bot'
+
+  client.login token
+  console.log 'logged in'
 
