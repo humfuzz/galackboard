@@ -134,5 +134,8 @@ class DiscordBot
     channel.send("Puzzle has been marked unsolved.")
 
 share.discord = new DiscordBot
+console.log 'shared the discord bot'
 
 client.login token
+console.log 'logged in'
+
