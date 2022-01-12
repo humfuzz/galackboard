@@ -428,6 +428,7 @@ doc_id_to_link = (id) ->
     }
 
     console.log "newDiscordChannel: ", id, name, round, categoryId
+    share.discord.debug("newDiscordChannel: " +  id + name + JSON.stringify(round) + categoryId)
 
     try
       # if the categoryId is null, make a new category for it
@@ -435,6 +436,8 @@ doc_id_to_link = (id) ->
         Puzzles.update id, { $set:
           debug: "need to create category for round " + round.name
         }
+
+        share.discord.debug("need to create category for round " + round.name)
 
         categoryId = await newDiscordCategory(round._id, round.name)
         Puzzles.update id, { $set:

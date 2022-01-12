@@ -61,8 +61,11 @@ console.log "Initializing Discord bot:", token, guildId
 client = new (Discord.Client)
 
 guild = undefined
+debugChannel = undefined
 client.on 'ready', () ->
   guild = await client.guilds.fetch(guildId)
+  debugChannel = await client.channels.fetch('930951256032284712')
+
   console.log "Discord bot connected."
   debug "Discord bot connected."
 
@@ -85,13 +88,14 @@ solvePrefix = '✓-'
 safeName = (name) ->
   return name.replace(/[!@#$%^&*()+=|'"?.><,~`\[\]\\\/]/g, '').slice(0,90)
 
-
 debug = (str) ->
-  debugChannel = await client.channels.fetch('930951256032284712')
   debugChannel.send(new Date().toISOString())
   debugChannel.send(str)
 
 class DiscordBot
+  debug: (str) ->
+    debug(str)
+
   # create discord channel category with given name
   createCategory: (name) ->
     debug("createCategory " + name)
@@ -102,12 +106,16 @@ class DiscordBot
       })
       return channel.id
     catch e
+      debug("ERROR " + e)
+
       throw e
 
   # create discord channel with given name
   # if given categoryId, then put channel under category
   createChannel: (name, categoryId) ->
+
     console.log 'creating discord channel with name ' + name
+    debug("createChannel " + name + ", " + categoryId + ", safeName: ", + safeName)
 
     channel = await guild.channels.create(safeName(name))
 
