@@ -427,6 +427,10 @@ doc_id_to_link = (id) ->
       debug: "newDiscordChannel: " +  id + name + JSON.stringify(round) + categoryId
     }
 
+    Puzzles.update id, { $set:
+      debug: "WHAT'S IN THE BOX: " + JSON.stringify(share.discord)
+    }
+
     console.log "newDiscordChannel: ", id, name, round, categoryId
     share.discord.debug("newDiscordChannel: " +  id + name + JSON.stringify(round) + categoryId)
 
