@@ -109,7 +109,7 @@ Template.puzzle.events
     name = puzzle?.name
     round = model.Rounds.findOne puzzles: puzzle?._id
 
-    console.log id, name, round
+    # console.log id, name, round
     Meteor.call 'chatToDiscord',
       id: id,
       name: name, 

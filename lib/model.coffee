@@ -422,6 +422,8 @@ doc_id_to_link = (id) ->
 
     categoryId = round.discordCategoryId
 
+    console.log "newDiscordChannel: ", id, name, round, categoryId
+
     try
       # if the categoryId is null, make a new category for it
       if !categoryId?

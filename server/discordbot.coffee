@@ -42,6 +42,8 @@ if !token?
   share.discord = new NoDiscordBot
   return
 
+console.log "Initializing Discord bot."
+
 # last requirement: add Titan to the server
 #   this is required for the client embed to work
 #   https://titanembeds.com/
