@@ -212,6 +212,7 @@ export class Drive
     @ringhuntersFolder = (awaitOrEnsureFolder @drive, "#{Meteor.settings?.public?.chatName ? 'Ringhunters'} Uploads", @rootFolder).id
   
   createPuzzle: (name) ->
+    console.log "Google Drive: createPuzzle", name
     folder = ensureFolder @drive, name, @rootFolder
     # is the spreadsheet already there?
     spreadsheet = ensure @drive, name, folder, spreadsheetSettings
