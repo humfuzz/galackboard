@@ -1,6 +1,7 @@
 <template name="puzzle_info">
 <div>
   <h1><a href="{{puzzle.link}}" target="_blank" style="text-decoration: underline;">{{puzzle.name}}</a></h1>
+  <h4>Round: {{round.name}}</h4>
   {{#with puzzle}}
   {{#if solved}}
     <b>SOLVED! Answer: {{tag "answer"}}{{#if tag "backsolved"}} (backsolved){{/if}}</b>
@@ -150,20 +151,38 @@
     {{/unless}}
     <div class="bb-bottom-right-content" style="{{#unless currentViewIs "info"}}height: {{vsize}}px{{/unless}}">{{! start bottom right splitter }}
 
-      <!-- TODO: insert channel-id from puzzle metadata -->
-      <!-- TODO: inject server-id from meteor settings -->
-      {{> discord 
-        server="929949526230446090"
-        channel="929950938549084210"
-      }}
-      <!-- {{> embedded_chat}} -->
+      <!-- discord: {{puzzle.discordChannelId}} -->
+      <!-- Meteor.settings.public.discordServerId -->
 
-      <!-- TODO: replace with open in discord:// link -->
-      <div class="bb-chat-pop-out {{#if currentViewIs "info"}}in-margin{{/if}}">
-        <a href="/chat/puzzles/{{puzzle._id}}" class="chat-link bb-pop-out"
-           target="chat{{puzzle._id}}"><i class="fas fa-expand-arrows-alt"></i>
-      Pop out</a>
-      </div>
+      {{#if puzzle.discordChannelId}}
+        <div class="bb-chat-flex">
+          <div class="bb-discord-name">{{discordChannelName}}</div>
+          <div class="bb-chat-pop-out {{#if currentViewIs "info"}}in-margin{{/if}}">
+            <a href="discord://discordapp.com/channels/{{discordServerId}}/{{puzzle.discordChannelId}}"
+              target="_self"><i class="fab fa-discord"></i>
+              Open in Discord</a>
+          </div>
+        </div>
+        {{> discord server=discordServerId channelId=puzzle.discordChannelId }}
+
+      {{else}}
+        {{> embedded_chat}}
+
+        <div class="bb-chat-flex">
+          <div class="bb-create-discord bb-chat-pop-out {{#if currentViewIs "info"}}in-margin{{/if}}">
+            <a href="" 
+              target="_self"><i class="fab fa-discord"></i>
+              Create Discord channel</a>
+          </div>
+
+          <div class="bb-chat-pop-out {{#if currentViewIs "info"}}in-margin{{/if}}">
+            <a href="/chat/puzzles/{{puzzle._id}}" class="chat-link bb-pop-out"
+              target="chat{{puzzle._id}}"><i class="fas fa-expand-arrows-alt"></i>
+              Pop out</a>
+          </div>
+        </div>
+
+      {{/if}}
     </div>
   </div>
 {{/horizontal_splitter}}

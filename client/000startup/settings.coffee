@@ -23,6 +23,9 @@ settings.INITIAL_CHAT_LIMIT = server.initialChatLimit ? 200
 
 settings.CHAT_LIMIT_INCREMENT = server.chatLimitIncrement ? 100
 
+# discord server, can be undefined
+settings.DISCORD_SERVER_ID = server.discordServerId
+
 # -- Performance settings --
 
 # make fewer people subscribe to ringhunters chat.

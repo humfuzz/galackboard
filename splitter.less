@@ -117,10 +117,22 @@ html.fullHeight {
             background: url('/img/irongrip.png');
             #messageInput { margin-top: 3px; }
           }
+          .bb-chat-flex {
+            position: absolute;
+            right: 9px;
+            display: flex;
+            justify-content: flex-end;
+          }
+          .bb-discord-name {
+            font-weight: bold;
+            color: rgb(77, 87, 99);
+            margin: 0 5px;
+          }
+
           .bb-chat-pop-out {
-            position: absolute; top: 0; right: 14px;
             background: white;
             border: 1px solid #888;
+            margin: 0 5px 0 0;
             padding-left: 2px; padding-right: 4px;
             border-bottom-left-radius: 5px;
             &.in-margin {

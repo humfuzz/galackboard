@@ -72,6 +72,13 @@ Template.puzzle.helpers
   hsize: -> share.Splitter.hsize.get()
   currentViewIs: (view) -> currentViewIs @puzzle, view
   color: -> color @puzzle if @puzzle
+  discordChannelName: -> 
+    puzzle = model.Puzzles.findOne Session.get 'id'
+    name = puzzle?.name ? 'UNKNOWN-CHANNEL'
+
+    # too lazy to get actual discord name through server side
+    # let's just do a facsimile of the discord channel name
+    return "#" + name.replaceAll(' ', '-').replace(/[!@#$%^&*()+=|'"?.><,~`\[\]\\\/]/g, '').toLowerCase()
 
 Template.header_breadcrumb_extra_links.helpers
   currentViewIs: (view) -> currentViewIs this, view
@@ -92,6 +99,21 @@ Template.puzzle.onCreated ->
     @subscribe 'puzzle-by-id', id
     @subscribe 'round-for-puzzle', id
     @subscribe 'puzzles-by-meta', id
+
+Template.puzzle.events
+  # create a discord chat
+  "click .bb-create-discord": (event, template) ->
+    event.preventDefault()
+    id = Session.get 'id'
+    puzzle = model.Puzzles.findOne id
+    name = puzzle?.name
+    round = model.Rounds.findOne puzzles: puzzle?._id
+
+    console.log id, name, round
+    Meteor.call 'chatToDiscord',
+      id: id,
+      name: name, 
+      round: round
 
 Template.puzzle_summon_button.helpers
   stuck: -> model.isStuck this

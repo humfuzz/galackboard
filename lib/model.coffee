@@ -64,6 +64,7 @@ LastAnswer = BBCollection.last_answer = \
 #   puzzles: [ array of puzzle _ids, in order ]
 #            Preserving order is why this is a list here and not a foreign key
 #            in the puzzle.
+#   discordCategoryId: ID of discord category for this puzzle
 Rounds = BBCollection.rounds = new Mongo.Collection "rounds"
 if Meteor.isServer
   Rounds._ensureIndex {canon: 1}, {unique:true, dropDups:true}
@@ -97,6 +98,7 @@ if Meteor.isServer
 #   puzzles: array of puzzle _ids for puzzles that feed into this.
 #            absent if this isn't a meta. empty if it is, but nothing feeds into
 #            it yet.
+#   discordChannelId: ID of discord channel for this puzzle
 #   feedsInto: array of puzzle ids for metapuzzles this feeds into. Can be empty.
 #   if a has b in its feedsInto, then b should have a in its puzzles.
 #   This is kept denormalized because the lack of indexes in Minimongo would
@@ -395,6 +397,59 @@ doc_id_to_link = (id) ->
     return unless Meteor.isServer
     share.drive.deletePuzzle drive
 
+  newDiscordCategory = (roundId, name) ->
+    return unless Meteor.isServer
+    check roundId, NonEmptyString
+    check name, NonEmptyString
+    
+    try
+      categoryId = await share.discord.createCategory(name)
+    catch e
+      console.warn "Error trying to create Discord category:", e
+      return
+    
+    return unless categoryId?
+    Rounds.update roundId, { $set:
+      discordCategoryId: categoryId
+    }
+
+    return categoryId
+
+  newDiscordChannel = (id, name, round) ->
+    return unless Meteor.isServer
+    check id, NonEmptyString
+    check name, NonEmptyString
+
+    categoryId = round.discordCategoryId
+
+    try
+      # if the categoryId is null, make a new category for it
+      if !categoryId?
+        categoryId = await newDiscordCategory(round._id, round.name)
+
+      channelId = await share.discord.createChannel(name, categoryId)
+    catch e
+      console.warn "Error trying to create Discord channel:", e
+      return
+    
+    return unless channelId?
+    Puzzles.update id, { $set:
+      discordChannelId: channelId
+    }
+
+  renameDiscordChannel = (channelId, name) ->
+    return unless Meteor.isServer
+    check name, NonEmptyString
+    share.discord.renameChannel(channelId, name)
+
+  markDiscordChannelSolved = (channelId, answer) ->
+    return unless Meteor.isServer
+    share.discord.markChannelSolved(channelId, answer)
+
+  markDiscordChannelUnsolved = (channelId) ->
+    return unless Meteor.isServer
+    share.discord.markChannelUnsolved(channelId)
+
   moveWithinParent = (id, parentType, parentId, args) ->
     check id, NonEmptyString
     check parentType, ValidType
@@ -424,6 +479,9 @@ doc_id_to_link = (id) ->
         touched_by: canonical(args.who))
       
   Meteor.methods
+    chatToDiscord: (args) ->
+      newDiscordChannel args.id, args.name, args.round
+
     newRound: (args) ->
       check @userId, NonEmptyString
       round_prefix = RoundUrlPrefix.get()
@@ -436,11 +494,22 @@ doc_id_to_link = (id) ->
         sort_key: UTCNow()
       ensureDawnOfTime "rounds/#{r._id}"
       # TODO(torgen): create default meta
+
+      # discord: add channel category for round
+      newDiscordCategory r._id, args.name
+
       r
     renameRound: (args) ->
       check @userId, NonEmptyString
       renameObject "rounds", {args..., who: @userId}
       # TODO(torgen): rename default meta
+
+      # rename discord category
+      r = Rounds.findOne(args.id)
+
+      discordChannel = r?.discordCategoryId
+      renameDiscordChannel discordChannel, args.name if discordChannel?
+
     deleteRound: (id) ->
       check @userId, NonEmptyString
       check id, NonEmptyString
@@ -473,6 +542,8 @@ doc_id_to_link = (id) ->
         doc: args.doc or null
         link: args.link or link
         feedsInto: feedsInto
+        discordChannelId: null
+
       if args.puzzles?
         extra.puzzles = args.puzzles
       if args.mechanics?
@@ -499,8 +570,12 @@ doc_id_to_link = (id) ->
           $set:
             touched_by: p.touched_by
             touched: p.touched
-      # create google drive folder (server only)
+      # create google drive folder, discord channel (server only)
       newDriveFolder p._id, p.name
+      newDiscordChannel p._id, p.name, Rounds.findOne(args.round)
+
+      # TODO: if meta, add a M in front of title (but after solve)
+
       return p
     renamePuzzle: (args) ->
       check @userId, NonEmptyString
@@ -516,7 +591,9 @@ doc_id_to_link = (id) ->
       # rename google drive folder
       renameDriveFolder args.name, drive, spreadsheet, doc if result and drive?
 
-      # todo: rename discord
+      # rename discord channel
+      discordChannel = p?.discordChannelId
+      renameDiscordChannel discordChannel, args.name if discordChannel?
 
       return result
     deletePuzzle: (pid) ->
@@ -564,6 +641,9 @@ doc_id_to_link = (id) ->
         touched: now
         touched_by: @userId
 
+      # TODO discord: add M for meta
+      
+
     makeNotMeta: (id) ->
       check @userId, NonEmptyString
       check id, NonEmptyString
@@ -573,6 +653,8 @@ doc_id_to_link = (id) ->
         $set:
           touched: now
           touched_by: @userId
+
+      # TODO discord: remove M for meta
 
     feedMeta: (puzzleId, metaId) ->
       check @userId, NonEmptyString
@@ -1153,6 +1235,12 @@ doc_id_to_link = (id) ->
         Meteor.call 'cancelCallIn',
           id: c._id
           suppressLog: (c.answer is args.answer)
+
+      # add checkmark to discord channel
+      p = Puzzles.findOne id
+      discordChannel = p?.discordChannelId
+      markDiscordChannelSolved discordChannel, args.answer if discordChannel?
+
       return true
 
     addIncorrectAnswer: (args) ->
@@ -1200,6 +1288,11 @@ doc_id_to_link = (id) ->
       deleteTagInternal updateDoc, 'provided'
       Puzzles.update id, updateDoc
       oplog "Deleted answer for", 'puzzles', id, @userId
+
+      # remove checkmark to discord channel
+      p = Puzzles.findOne id
+      discordChannel = p?.discordChannelId
+      markDiscordChannelUnsolved discordChannel if discordChannel?
       return true
 
     favorite: (puzzle) ->
