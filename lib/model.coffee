@@ -522,6 +522,9 @@ doc_id_to_link = (id) ->
       deleteObject "rounds", {id, who: @userId}
 
     newPuzzle: (args) ->
+      console.log "newPuzzle", args
+
+
       check @userId, NonEmptyString
       check args, ObjectWith
         round: Match.Optional NonEmptyString
