@@ -65,10 +65,10 @@ client.on 'ready', () ->
   guild = await client.guilds.fetch(guildId)
   console.log "Discord bot connected."
 
-# # test ping pong
-# client.on 'message', (msg) ->
-#   if msg.content == 'ping'
-#     msg.reply 'pong in ' + msg.guild.id
+# test ping pong
+client.on 'message', (msg) ->
+  if msg.content == 'ping'
+    msg.reply 'pong in ' + msg.guild.id
 
 #   # (bot -> meteor) see bootstrap.coffee
 
