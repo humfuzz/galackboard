@@ -432,7 +432,14 @@ doc_id_to_link = (id) ->
     try
       # if the categoryId is null, make a new category for it
       if !categoryId?
+        Puzzles.update id, { $set:
+          debug: "need to create category for round " + round.name
+        }
+
         categoryId = await newDiscordCategory(round._id, round.name)
+        Puzzles.update id, { $set:
+          debug: "created category " + categoryId
+        }
 
       channelId = await share.discord.createChannel(name, categoryId)
     catch e
