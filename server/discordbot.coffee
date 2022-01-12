@@ -61,6 +61,7 @@ client = new (Discord.Client)
 guild = undefined
 client.on 'ready', () ->
   guild = await client.guilds.fetch(guildId)
+  console.log "Discord bot connected."
 
 # # test ping pong
 # client.on 'message', (msg) ->
@@ -94,7 +95,7 @@ class DiscordBot
   # create discord channel with given name
   # if given categoryId, then put channel under category
   createChannel: (name, categoryId) ->
-    # console.log 'creating discord channel with name ' + name
+    console.log 'creating discord channel with name ' + name
 
     channel = await guild.channels.create(safeName(name))
 
