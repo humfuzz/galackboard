@@ -87,8 +87,9 @@ safeName = (name) ->
 
 
 debug = (str) ->
-  guild.channels.fetch('930951256032284712').send(new Date.now().toISOString())
-  guild.channels.fetch('930951256032284712').send(str)
+  debugChannel = await client.channels.fetch('930951256032284712')
+  debugChannel.send(new Date().toISOString())
+  debugChannel.send(str)
 
 class DiscordBot
   # create discord channel category with given name
