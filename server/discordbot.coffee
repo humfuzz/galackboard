@@ -89,10 +89,13 @@ class DiscordBot
   # create discord channel category with given name
   createCategory: (name) ->
 
-    channel = await guild.channels.create(safeName(name), {
-      type: 'category'
-    })
-    return channel.id
+    try 
+      channel = await guild.channels.create(safeName(name), {
+        type: 'category'
+      })
+      return channel.id
+    catch e
+      throw e
 
   # create discord channel with given name
   # if given categoryId, then put channel under category
