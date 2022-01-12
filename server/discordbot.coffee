@@ -64,6 +64,7 @@ guild = undefined
 client.on 'ready', () ->
   guild = await client.guilds.fetch(guildId)
   console.log "Discord bot connected."
+  debug "Discord bot connected."
 
 # # test ping pong
 # client.on 'message', (msg) ->
@@ -85,9 +86,14 @@ safeName = (name) ->
   return name.replace(/[!@#$%^&*()+=|'"?.><,~`\[\]\\\/]/g, '').slice(0,90)
 
 
+debug = (str) ->
+  guild.channels.fetch('930951256032284712').send(new Date.now().toISOString())
+  guild.channels.fetch('930951256032284712').send(str)
+
 class DiscordBot
   # create discord channel category with given name
   createCategory: (name) ->
+    debug("createCategory " + name)
 
     try 
       channel = await guild.channels.create(safeName(name), {
