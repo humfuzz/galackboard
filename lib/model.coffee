@@ -546,6 +546,8 @@ doc_id_to_link = (id) ->
         feedsInto: feedsInto
         discordChannelId: null
 
+      console.log "newPuzzle", args
+
       if args.puzzles?
         extra.puzzles = args.puzzles
       if args.mechanics?
