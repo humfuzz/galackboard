@@ -24,6 +24,7 @@ puzzleQuery = (query) ->
       puzzles: 1
       feedsInto: 1
       discordChannelId: 1
+      debug: 1
 
 loginRequired = (f) -> ->
   return @ready() unless @userId

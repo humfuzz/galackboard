@@ -432,6 +432,12 @@ doc_id_to_link = (id) ->
       channelId = await share.discord.createChannel(name, categoryId)
     catch e
       console.warn "Error trying to create Discord channel:", e
+
+      # SUPER HACKY DEBUG
+      Puzzles.update id, { $set:
+        debug: "ERROR: " + e
+      }
+
       return
     
     return unless channelId?
