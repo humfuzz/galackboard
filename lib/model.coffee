@@ -422,6 +422,11 @@ doc_id_to_link = (id) ->
 
     categoryId = round.discordCategoryId
 
+    # SUPER HACKY DEBUG
+    Puzzles.update id, { $set:
+      debug: "newDiscordChannel: " +  id + name + JSON.stringify(round) + categoryId
+    }
+
     console.log "newDiscordChannel: ", id, name, round, categoryId
 
     try
