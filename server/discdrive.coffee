@@ -4,7 +4,7 @@ import { FailDrive } from './imports/drive.coffee'
 
 
 class DiscDrive
-  constructor: (@drive) ->
+  constructor: (token, guildId) ->
     @disc = "bla" 
     @drive = "hey"
   
@@ -14,7 +14,7 @@ if Meteor.isAppTest
   return
 Promise.await do ->
   try
-    share.discdrive = new DiscDrive
+    share.discdrive = new DiscDrive "token", "guildId"
   catch error
     console.warn "Error driving a disc:", error
     share.discdrive = new FailDrive
