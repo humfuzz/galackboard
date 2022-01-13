@@ -14,6 +14,7 @@ debug = (str, channel) ->
 
 export class DiscordBot
   constructor: (@guild, @client, @debugChannel) ->
+    @something = "blabla"
     @debug("Discord bot connected.")
 
   debug: (str) ->
