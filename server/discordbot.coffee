@@ -77,9 +77,9 @@ class DiscordBot
 
     topic = ""
     if boardLink?
-      topic += "sheet: <" boardLink + ">\n"
+      topic += "sheet: <" + boardLink + ">\n\n"
     if puzzLink?
-      topic += "puzz: <" puzzLink + ">"
+      topic += "puzz: <" + puzzLink + ">"
     
     if topic != ""
       channel.setTopic(topic)
