@@ -62,7 +62,7 @@ class DiscordBot
 
   # create discord channel with given name
   # if given categoryId, then put channel under category
-  createChannel: (name, categoryId, answer) ->
+  createChannel: (name, categoryId, answer, boardLink, puzzLink) ->
     @debug("createChannel " + name + ", " + categoryId + ", safeName: " + safeName(name))
 
     channel = await @guild.channels.create(safeName(name))
@@ -74,6 +74,16 @@ class DiscordBot
     # if solved, mark it as solved
     if answer?
       @markChannelSolved(channel.id, answer)
+
+    topic = ""
+    if boardLink?
+      topic += boardLink + "\n"
+    if puzzLink?
+      topic += puzzLink
+    
+    if topic != ""
+      channel.setTopic(topic)
+      channel.send(topic)
 
     return channel.id
   

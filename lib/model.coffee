@@ -415,10 +415,17 @@ doc_id_to_link = (id) ->
 
     return categoryId
 
-  newDiscordChannel = (id, name, round, answer) ->
+  newDiscordChannel = (id, name, round, puzzle) ->
     return unless Meteor.isServer
     check id, NonEmptyString
     check name, NonEmptyString
+
+    answer = puzzle?.tags?.answer?.value
+    root = process.env.ROOT_URL
+    if root?
+      boardLink = root + "/puzzles/" + puzzle?._id
+
+    puzzLink = puzzle?.link
 
     categoryId = round.discordCategoryId
 
@@ -435,7 +442,7 @@ doc_id_to_link = (id) ->
           debug: "created category " + categoryId
         }
 
-      channelId = await share.discord.createChannel(name, categoryId, answer)
+      channelId = await share.discord.createChannel(name, categoryId, answer, boardLink, puzzLink)
     catch e
       console.warn "Error trying to create Discord channel:", e
       return
@@ -488,7 +495,7 @@ doc_id_to_link = (id) ->
       
   Meteor.methods
     chatToDiscord: (args) ->
-      newDiscordChannel args.id, args.name, args.round, args.answer
+      newDiscordChannel args.id, args.name, args.round, args.puzzle
 
     newRound: (args) ->
       check @userId, NonEmptyString
@@ -584,7 +591,7 @@ doc_id_to_link = (id) ->
             touched: p.touched
       # create google drive folder, discord channel (server only)
       newDriveFolder p._id, p.name
-      newDiscordChannel p._id, p.name, Rounds.findOne(args.round)
+      newDiscordChannel p._id, p.name, Rounds.findOne(args.round), p
 
       # TODO: if meta, add a M in front of title (but after solve)
 
