@@ -4,9 +4,9 @@ import { FailDrive } from './imports/drive.coffee'
 
 
 class DiscDrive
-  constructor: (token, guildId) ->
+  constructor: (token, @guildId) ->
     @disc = "bla" 
-    @drive = "hey"
+    @drive = @guildId
   
 # Intialize APIs and load rootFolder
 if Meteor.isAppTest
@@ -22,7 +22,7 @@ Promise.await do ->
       console.warn "No Discord Server ID found in Meteor public settings: settings.public.discordServerId"
       console.warn "Discord integration disabled."
 
-      share.discord = {"bad":"bad"}
+      share.discdrive = {"bad":"bad"}
       return
 
     # this is galackbot's token:
@@ -37,7 +37,7 @@ Promise.await do ->
       console.warn "No Discord Bot Token found in environment variables: process.env.DISCORD_BOT_TOKEN"
       console.warn "Discord integration disabled."
 
-      share.discord = {"bad":"bad"}
+      share.discdrive = {"bad":"bad"}
       return
 
     share.discdrive = new DiscDrive token, guildId
