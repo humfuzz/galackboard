@@ -94,9 +94,9 @@ Meteor.startup ->
       share.discord = new DiscordBot guild, client, debugChannel
     
     console.log 'shared the discord bot'
-    share.discord = {
-      "oh": "noes"
-    }
+    # share.discord = {
+    #   "oh": "noes"
+    # }
 
     client.login token
     console.log 'logged in'
