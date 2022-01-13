@@ -8,14 +8,14 @@ class DiscDrive
     client = new (Discord.Client)
     client.login token
 
-    client.on 'ready', () -> # bind stuff
-      guild = await client.guilds.fetch(guildId)
+    # client.on 'ready', () ->
+    #   guild = await client.guilds.fetch(guildId)
 
-      console.log "Discord bot connected."
-      # debug "Discord bot connected."
+    #   console.log "Discord bot connected."
+    #   # debug "Discord bot connected."
 
-    @client = client
-    @guild = "hey"
+    @disc = "bla" 
+    @drive = "hey"
   
 # Intialize APIs and load rootFolder
 if Meteor.isAppTest
