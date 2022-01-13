@@ -23,7 +23,7 @@ Promise.await do ->
       console.log "No Discord Server ID found in Meteor public settings: settings.public.discordServerId"
       console.log "Discord integration disabled."
 
-      share.discdrive = {"bad":"bad"}
+      share.discdrive = {"bad":"NO GUILD ID"}
       return
 
     # this is galackbot's token:
@@ -38,7 +38,7 @@ Promise.await do ->
       console.log "No Discord Bot Token found in environment variables: process.env.DISCORD_BOT_TOKEN"
       console.log "Discord integration disabled."
 
-      share.discdrive = {"bad":"bad"}
+      share.discdrive = {"bad":"NO TOKEN"}
       return
 
     console.log "~~~we can drive a disc with token, guildId: " + token + ", " + guildId + "~~~"
