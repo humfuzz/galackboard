@@ -34,8 +34,10 @@ Meteor.startup ->
     # on the server, the codex-batch.service launches the bot
     #  but we don't want the subservices codex@{port} to override them
     # return if share.discord instanceof DiscordBot
-    console.warn "do_batch?", share.DO_BATCH_PROCESSING
-    return unless share.DO_BATCH_PROCESSING
+    # console.warn "do_batch?", share.DO_BATCH_PROCESSING
+    # return unless share.DO_BATCH_PROCESSING
+
+    # let's just see what happens
 
     # TODO: do this differently (or just give the subservices the damn token)
 
