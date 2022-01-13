@@ -24,7 +24,6 @@ puzzleQuery = (query) ->
       puzzles: 1
       feedsInto: 1
       discordChannelId: 1
-      debug: 1
 
 loginRequired = (f) -> ->
   return @ready() unless @userId
@@ -38,9 +37,7 @@ Meteor.publish = ((publish) ->
       console.log 'client subscribed to', name, arguments
       func.apply(this, arguments)
     publish.call(Meteor, name, func2)
-)(Meteor.publish) if true # disable by default TODO: change back
-
-
+)(Meteor.publish) if false # disable by default
 
 Meteor.publish 'all-roundsandpuzzles', loginRequired -> [
   model.Rounds.find(), @puzzleQuery({})

@@ -422,36 +422,13 @@ doc_id_to_link = (id) ->
 
     categoryId = round.discordCategoryId
 
-    # SUPER HACKY DEBUG
-    Puzzles.update id, { $set:
-      debug: "newDiscordChannel: " +  id + name + JSON.stringify(round) + categoryId
-    }
-
-    Puzzles.update id, { $set:
-      debug: "WHAT'S IN SHARE.DISCORD: " + JSON.stringify(share.discord)
-    }
-
-    
-    Puzzles.update id, { $set:
-      debug: "WHAT'S IN SHARE.DRIVE: " + JSON.stringify(share.drive)
-    }
-
-        
-    Puzzles.update id, { $set:
-      debug: "WHAT'S IN SHARE.DISCDRIVE: " + JSON.stringify(share.discdrive)
-    }
-
     console.log "newDiscordChannel: ", id, name, round, categoryId
-    share.discord.debug("newDiscordChannel: " +  id + name + JSON.stringify(round) + categoryId)
-
     try
       # if the categoryId is null, make a new category for it
       if !categoryId?
         Puzzles.update id, { $set:
           debug: "need to create category for round " + round.name
         }
-
-        share.discord.debug("need to create category for round " + round.name)
 
         categoryId = await newDiscordCategory(round._id, round.name)
         Puzzles.update id, { $set:
@@ -461,12 +438,6 @@ doc_id_to_link = (id) ->
       channelId = await share.discord.createChannel(name, categoryId)
     catch e
       console.warn "Error trying to create Discord channel:", e
-
-      # SUPER HACKY DEBUG
-      Puzzles.update id, { $set:
-        debug: "ERROR: " + e
-      }
-
       return
     
     return unless channelId?

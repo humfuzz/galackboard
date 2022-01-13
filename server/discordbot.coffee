@@ -41,8 +41,6 @@ debug = (str, channel) ->
 
 class DiscordBot
   constructor: (@guild, @client, @debugChannel) ->
-    @something = "blabla"
-    @debug("Discord bot connected.")
 
   debug: (str) ->
     debug(str, @debugChannel)
@@ -54,6 +52,7 @@ class DiscordBot
     try 
       channel = await @guild.channels.create(safeName(name), {
         type: 'category'
+        position: 1
       })
       return channel.id
     catch e
@@ -64,8 +63,6 @@ class DiscordBot
   # create discord channel with given name
   # if given categoryId, then put channel under category
   createChannel: (name, categoryId) ->
-
-    console.log 'creating discord channel with name ' + name
     @debug("createChannel " + name + ", " + categoryId + ", safeName: " + safeName(name))
 
     channel = await @guild.channels.create(safeName(name))
@@ -130,8 +127,6 @@ Meteor.startup ->
       share.discord = new NoDiscordBot
       return
 
-    console.log "Initializing Discord bot:", token, guildId
-
     # last requirement: add Titan to the server
     #   this is required for the client embed to work
     #   https://titanembeds.com/
@@ -159,7 +154,5 @@ Meteor.startup ->
 
       share.discord = new DiscordBot guild, client, debugChannel
     
-    console.log 'shared the discord bot'
     client.login token
-    console.log 'logged in'
 
