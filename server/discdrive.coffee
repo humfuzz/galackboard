@@ -1,5 +1,5 @@
 'use strict'
-
+import Discord from 'discord.js-12'
 import { FailDrive } from './imports/drive.coffee'
 
 
