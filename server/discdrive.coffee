@@ -14,6 +14,7 @@ if Meteor.isAppTest
   return
 Promise.await do ->
   try
+    return unless share.DO_BATCH_PROCESSING
     console.log "~~~driving a disc~~~"
 
     # this is the discord server ID you want to run galackbot and integrate galackboard with.
