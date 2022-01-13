@@ -4,7 +4,7 @@ import { FailDrive } from './imports/drive.coffee'
 
 
 class DiscDrive
-  constructor: (token, guildId) ->
+  constructor: () ->#token, guildId) ->
     # client = new (Discord.Client)
     # client.login token
 
@@ -52,7 +52,7 @@ Promise.await do ->
     console.log "Initializing Discord bot:", token, guildId
 
 
-    share.discdrive = new DiscDrive token, guildId
+    share.discdrive = new DiscDrive #token, guildId
   catch error
     console.warn "Error driving a disc:", error
     share.discdrive = new FailDrive
