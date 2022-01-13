@@ -38,7 +38,7 @@ Meteor.publish = ((publish) ->
       console.log 'client subscribed to', name, arguments
       func.apply(this, arguments)
     publish.call(Meteor, name, func2)
-)(Meteor.publish) if false # disable by default
+)(Meteor.publish) if true # disable by default
 
 
 
