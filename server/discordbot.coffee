@@ -33,11 +33,20 @@ solvePrefix = '✓-'
 # remove illegal characters and then keep under 90chars 
 #   max channel name is 100, but we save some for prefixes
 safeName = (name) ->
-  return name.replace(/[!@#$%^&*()+=|'"?.><,~`\[\]\\\/]/g, '').slice(0,90)
+  return name.replace(/[!@#$%^&*()+=|'"?.><,~`;:\[\]\\\/]/g, '').slice(0,90)
 
 debug = (str, channel) ->
   channel.send(new Date().toISOString())
   channel.send(str)
+
+makeTopic = (boardLink, puzzLink) ->
+  topic = ""
+  if boardLink?
+    topic += "sheet: <" + boardLink + ">\n\n"
+  if puzzLink?
+    topic += "puzz: <" + puzzLink + ">"
+  
+  return topic
 
 class DiscordBot
   constructor: (@guild, @client, @debugChannel) ->
@@ -75,17 +84,13 @@ class DiscordBot
     if answer?
       @markChannelSolved(channel.id, answer)
 
-    topic = ""
-    if boardLink?
-      topic += "sheet: <" + boardLink + ">\n\n"
-    if puzzLink?
-      topic += "puzz: <" + puzzLink + ">"
+    topic = makeTopic(boardLink, puzzLink)
     
     if topic != ""
       channel.setTopic(topic)
-      channel.send(topic)
+      topicMessage = await channel.send(topic)
 
-    return channel.id
+    return [channel.id, topicMessage.id]
   
   # rename existing channel with id to name
   renameChannel: (id, name) ->
@@ -102,7 +107,7 @@ class DiscordBot
     channel = await @client.channels.fetch(id)
     if !channel.name.startsWith(solvePrefix)
       channel.setName(solvePrefix + channel.name)
-    channel.send("Puzzle solved! Answer: `" + answer + "`")
+    channel.send("Puzzle solved! Answer: ``" + answer + "``")
       .then (message) ->
         message.react('🎉')
 
@@ -112,6 +117,18 @@ class DiscordBot
     if channel.name.startsWith(solvePrefix)
       channel.setName(channel.name.slice(solvePrefix.length))
     channel.send("Puzzle has been marked unsolved.")
+
+  updateTopic: (channelId, topicMessageId, boardLink, puzzLink) ->
+    channel = await @client.channels.fetch(channelId)
+    topic = makeTopic(boardLink, puzzLink)
+    
+    if topic != ""
+      channel.setTopic(topic)
+
+      if topicMessageId?
+        message = await channel.messages.fetch(topicMessageId)
+        message.edit(topic)
+
 
 Meteor.startup ->
   Promise.await do ->

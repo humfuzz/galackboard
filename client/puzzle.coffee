@@ -78,7 +78,7 @@ Template.puzzle.helpers
 
     # too lazy to get actual discord name through server side
     # let's just do a facsimile of the discord channel name
-    return "#" + name.replaceAll(' ', '-').replace(/[!@#$%^&*()+=|'"?.><,~`\[\]\\\/]/g, '').toLowerCase()
+    return "#" + name.replaceAll(' ', '-').replace(/[!@#$%^&*()+=|'"?.><,~`;:\[\]\\\/]/g, '').toLowerCase()
 
 Template.header_breadcrumb_extra_links.helpers
   currentViewIs: (view) -> currentViewIs this, view

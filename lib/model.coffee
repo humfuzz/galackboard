@@ -442,7 +442,7 @@ doc_id_to_link = (id) ->
           debug: "created category " + categoryId
         }
 
-      channelId = await share.discord.createChannel(name, categoryId, answer, boardLink, puzzLink)
+      [channelId, topicMessageId] = await share.discord.createChannel(name, categoryId, answer, boardLink, puzzLink)
     catch e
       console.warn "Error trying to create Discord channel:", e
       return
@@ -450,6 +450,7 @@ doc_id_to_link = (id) ->
     return unless channelId?
     Puzzles.update id, { $set:
       discordChannelId: channelId
+      discordTopicMessageId: topicMessageId
     }
 
   renameDiscordChannel = (channelId, name) ->
@@ -464,6 +465,24 @@ doc_id_to_link = (id) ->
   markDiscordChannelUnsolved = (channelId) ->
     return unless Meteor.isServer
     share.discord.markChannelUnsolved(channelId)
+
+  updateDiscordTopic = (puzzle, link) ->
+    return unless Meteor.isServer
+    check puzzle, ObjectWith
+      _id: NonEmptyString
+      discordChannelId: NonEmptyString
+      discordTopicMessageId: Match.Optional(NonEmptyString)
+    check link, NonEmptyString
+
+    root = process.env.ROOT_URL
+    if root?
+      boardLink = root + "/puzzles/" + puzzle._id
+
+    puzzLink = puzzle.link
+    channelId = puzzle.discordChannelId
+    topicMessageId = puzzle.discordTopicMessageId
+
+    share.discord.updateTopic(channelId, topicMessageId, boardLink, puzzLink)
 
   moveWithinParent = (id, parentType, parentId, args) ->
     check id, NonEmptyString
@@ -1052,6 +1071,13 @@ doc_id_to_link = (id) ->
       args.fields.touched = now
       args.fields.touched_by = @userId
       collection(args.type).update id, $set: args.fields
+
+      # TODO: if field set is link, update discord.
+      link = args.fields.link
+      if link? && args.type = "puzzles"
+        puzzle = Puzzles.findOne(id)
+        updateDiscordTopic(puzzle, link)
+
       return true
 
     setTag: (args) ->
