@@ -39,7 +39,7 @@ export class DiscordBot
   createChannel: (name, categoryId) ->
 
     console.log 'creating discord channel with name ' + name
-    @debug("createChannel " + name + ", " + categoryId + ", safeName: " + safeName)
+    @debug("createChannel " + name + ", " + categoryId + ", safeName: " + safeName(name))
 
     channel = await @guild.channels.create(safeName(name))
 
