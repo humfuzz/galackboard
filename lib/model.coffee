@@ -428,12 +428,17 @@ doc_id_to_link = (id) ->
     }
 
     Puzzles.update id, { $set:
-      debug: "WHAT'S IN THE BOX: " + JSON.stringify(share.discord)
+      debug: "WHAT'S IN SHARE.DISCORD: " + JSON.stringify(share.discord)
     }
 
     
     Puzzles.update id, { $set:
-      debug: "WHAT'S IN THE BIG BOX: " + JSON.stringify(share.drive)
+      debug: "WHAT'S IN SHARE.DRIVE: " + JSON.stringify(share.drive)
+    }
+
+        
+    Puzzles.update id, { $set:
+      debug: "WHAT'S IN SHARE.DISCDRIVE: " + JSON.stringify(share.discdrive)
     }
 
     console.log "newDiscordChannel: ", id, name, round, categoryId
