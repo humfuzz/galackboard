@@ -5,8 +5,8 @@ import { FailDrive } from './imports/drive.coffee'
 
 class DiscDrive
   constructor: (token, guildId) ->
-    client = new (Discord.Client)
-    client.login token
+    # client = new (Discord.Client)
+    # client.login token
 
     # client.on 'ready', () ->
     #   guild = await client.guilds.fetch(guildId)
