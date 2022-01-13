@@ -108,12 +108,14 @@ Template.puzzle.events
     puzzle = model.Puzzles.findOne id
     name = puzzle?.name
     round = model.Rounds.findOne puzzles: puzzle?._id
+    answer = puzzle?.tags?.answer?.value
 
     # console.log id, name, round
     Meteor.call 'chatToDiscord',
       id: id,
       name: name, 
-      round: round
+      round: round,
+      answer: answer
 
 Template.puzzle_summon_button.helpers
   stuck: -> model.isStuck this

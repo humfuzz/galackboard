@@ -415,14 +415,14 @@ doc_id_to_link = (id) ->
 
     return categoryId
 
-  newDiscordChannel = (id, name, round) ->
+  newDiscordChannel = (id, name, round, answer) ->
     return unless Meteor.isServer
     check id, NonEmptyString
     check name, NonEmptyString
 
     categoryId = round.discordCategoryId
 
-    console.log "newDiscordChannel: ", id, name, round, categoryId
+    console.log "newDiscordChannel: ", id, name, round, categoryId, answer
     try
       # if the categoryId is null, make a new category for it
       if !categoryId?
@@ -435,7 +435,7 @@ doc_id_to_link = (id) ->
           debug: "created category " + categoryId
         }
 
-      channelId = await share.discord.createChannel(name, categoryId)
+      channelId = await share.discord.createChannel(name, categoryId, answer)
     catch e
       console.warn "Error trying to create Discord channel:", e
       return
@@ -488,7 +488,7 @@ doc_id_to_link = (id) ->
       
   Meteor.methods
     chatToDiscord: (args) ->
-      newDiscordChannel args.id, args.name, args.round
+      newDiscordChannel args.id, args.name, args.round, args.answer
 
     newRound: (args) ->
       check @userId, NonEmptyString
@@ -529,7 +529,6 @@ doc_id_to_link = (id) ->
 
     newPuzzle: (args) ->
       console.log "newPuzzle", args
-
 
       check @userId, NonEmptyString
       check args, ObjectWith

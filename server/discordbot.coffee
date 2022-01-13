@@ -62,7 +62,7 @@ class DiscordBot
 
   # create discord channel with given name
   # if given categoryId, then put channel under category
-  createChannel: (name, categoryId) ->
+  createChannel: (name, categoryId, answer) ->
     @debug("createChannel " + name + ", " + categoryId + ", safeName: " + safeName(name))
 
     channel = await @guild.channels.create(safeName(name))
@@ -70,6 +70,10 @@ class DiscordBot
     # add to round category
     if categoryId?
       channel.setParent(categoryId)
+
+    # if solved, mark it as solved
+    if answer?
+      @markChannelSolved(channel.id, answer)
 
     return channel.id
   
