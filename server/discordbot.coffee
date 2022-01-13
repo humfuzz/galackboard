@@ -33,7 +33,11 @@ Meteor.startup ->
 
     # on the server, the codex-batch.service launches the bot
     #  but we don't want the subservices codex@{port} to override them
-    return if share.discord instanceof DiscordBot
+    # return if share.discord instanceof DiscordBot
+    console.warn share.DO_BATCH_PROCESSING
+    return unless share.DO_BATCH_PROCESSING
+
+    # TODO: do this differently (or just give the subservices the damn token)
 
     # this is the discord server ID you want to run galackbot and integrate galackboard with.
     # ensure guild ID is set in Meteor settings: settings.public.discordServerId
