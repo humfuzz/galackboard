@@ -297,7 +297,12 @@ BlackboardRouter = Backbone.Router.extend
       console.log r
 
       # default meta
-      Meteor.call 'newPuzzle', {name: decodeURIComponent(n), round: r._id, puzzles: []}, (error, s) ->
+      Meteor.call 'newPuzzle', {
+        name: decodeURIComponent(n),
+        link: decodeURIComponent(l),
+        round: r._id,
+        puzzles: []
+      }, (error, s) ->
         throw error if error
 
     this.navigate "/", trigger: true

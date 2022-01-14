@@ -609,8 +609,8 @@ doc_id_to_link = (id) ->
             touched_by: p.touched_by
             touched: p.touched
       # create google drive folder, discord channel (server only)
-      newDiscordChannel p._id, p.name, Rounds.findOne(args.round), p
       newDriveFolder p._id, p.name
+      newDiscordChannel p._id, p.name, Rounds.findOne(args.round), p
 
       # TODO: if meta, add a M in front of title (but after solve)
 
