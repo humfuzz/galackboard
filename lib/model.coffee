@@ -1072,9 +1072,10 @@ doc_id_to_link = (id) ->
       args.fields.touched_by = @userId
       collection(args.type).update id, $set: args.fields
 
-      # TODO: if field set is link, update discord.
+      # console.log "setField", args
+
       link = args.fields.link
-      if link? && args.type = "puzzles"
+      if (link? && args.type == "puzzles")
         puzzle = Puzzles.findOne(id)
         updateDiscordTopic(puzzle, link)
 

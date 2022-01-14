@@ -222,6 +222,7 @@ BlackboardRouter = Backbone.Router.extend
     "": "BlackboardPage"
     "edit": "EditPage"
     "newPuzzle/:n/:l": "NewPuzzlePage"
+    "newRound/:n/:l": "NewRoundPage"
     "rounds/:round": "RoundPage"
     "puzzles/:puzzle": "PuzzlePage"
     "puzzles/:puzzle/:view": "PuzzlePage"
@@ -249,6 +250,18 @@ BlackboardRouter = Backbone.Router.extend
   NewPuzzlePage: (n, l) ->
     Meteor.call 'newPuzzle', {name: decodeURIComponent(n), link: decodeURIComponent(l)}, (error,r) ->
       throw error if error
+    this.navigate "/", trigger: true
+
+  NewRoundPage: (n, l) ->
+    Meteor.call 'newRound', {name: decodeURIComponent(n), link: decodeURIComponent(l)}, (error,r) ->
+      throw error if error
+
+      console.log r
+
+      # default meta
+      Meteor.call 'newPuzzle', {name: decodeURIComponent(n), round: r._id, puzzles: []}, (error, s) ->
+        throw error if error
+
     this.navigate "/", trigger: true
 
   PuzzlePage: (id, view=null) ->
