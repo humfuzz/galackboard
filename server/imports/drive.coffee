@@ -122,8 +122,8 @@ ensure = (drive, name, folder, settings) ->
     maxResults: 1
   .items[0]
   unless doc?
-    createCopy = settings.templateFileId is undefined
-    if createCopy
+    createFromUpload = settings.templateFileId is undefined
+    if createFromUpload
       doc =
         title: settings.titleFunc name
         mimeType: settings.uploadMimeType
@@ -143,7 +143,7 @@ ensure = (drive, name, folder, settings) ->
         fileId: settings.templateFileId
         body: doc
         resource: doc
-  ensurePermissions drive, doc.id, !createCopy
+  ensurePermissions drive, doc.id, !createFromUpload
   doc
 
 awaitFolder = (drive, name, parent) ->
