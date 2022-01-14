@@ -13,6 +13,7 @@ DOC_NAME = (name) -> "Notes: #{name}"
 # Constants
 GDRIVE_FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
 GDRIVE_SPREADSHEET_MIME_TYPE = 'application/vnd.google-apps.spreadsheet'
+GDRIVE_SPREADSHEET_TEMPLATE_ID = Meteor.settings.spreadsheetTemplateId
 GDRIVE_DOC_MIME_TYPE = 'application/vnd.google-apps.document'
 XLSX_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 MAX_RESULTS = 200
@@ -96,6 +97,7 @@ ensureNamedPermissions = (drive, id, email) =>
 spreadsheetSettings =
   titleFunc: WORKSHEET_NAME
   driveMimeType: GDRIVE_SPREADSHEET_MIME_TYPE
+  templateFileId: GDRIVE_SPREADSHEET_TEMPLATE_ID
   uploadMimeType: XLSX_MIME_TYPE
   uploadTemplate: ->
     # The file is small enough to fit in ram, so don't recreate a file read
@@ -112,7 +114,7 @@ docSettings =
   driveMimeType: GDRIVE_DOC_MIME_TYPE
   uploadMimeType: 'text/plain'
   uploadTemplate: -> 'Put notes here.'
-  
+
 ensure = (drive, name, folder, settings) ->
   doc = apiThrottle drive.children, 'list',
     folderId: folder.id
@@ -120,17 +122,24 @@ ensure = (drive, name, folder, settings) ->
     maxResults: 1
   .items[0]
   unless doc?
-    doc =
-      title: settings.titleFunc name
-      mimeType: settings.uploadMimeType
-      parents: [id: folder.id]
-    doc = apiThrottle drive.files, 'insert',
-      convert: true
-      body: doc
-      resource: doc
-      media:
+    if settings.templateFileId is undefined
+      doc =
+        title: settings.titleFunc name
         mimeType: settings.uploadMimeType
-        body: settings.uploadTemplate()
+        parents: [id: folder.id]
+      doc = apiThrottle drive.files, 'insert',
+        convert: true
+        body: doc
+        resource: doc
+        media:
+          mimeType: settings.uploadMimeType
+          body: settings.uploadTemplate()
+    else
+      doc = apiThrottle drive.files, 'copy',
+        fileId: settings.templateFileId
+        json:
+          name: settings.titleFunc name
+          parents: [id: folder.id]
   ensurePermissions drive, doc.id
   doc
 
@@ -210,7 +219,7 @@ export class Drive
   constructor: (@drive) ->
     @rootFolder = (awaitOrEnsureFolder @drive, ROOT_FOLDER_NAME()).id
     @ringhuntersFolder = (awaitOrEnsureFolder @drive, "#{Meteor.settings?.public?.chatName ? 'Ringhunters'} Uploads", @rootFolder).id
-  
+
   createPuzzle: (name) ->
     console.log "Google Drive: createPuzzle", name
     folder = ensureFolder @drive, name, @rootFolder
