@@ -530,7 +530,7 @@ doc_id_to_link = (id) ->
       # TODO(torgen): create default meta
 
       # discord: add channel category for round
-      newDiscordCategory r._id, args.name
+      await newDiscordCategory r._id, args.name
 
       r
     renameRound: (args) ->
@@ -609,8 +609,8 @@ doc_id_to_link = (id) ->
             touched_by: p.touched_by
             touched: p.touched
       # create google drive folder, discord channel (server only)
-      newDriveFolder p._id, p.name
       newDiscordChannel p._id, p.name, Rounds.findOne(args.round), p
+      newDriveFolder p._id, p.name
 
       # TODO: if meta, add a M in front of title (but after solve)
 
@@ -1042,6 +1042,7 @@ doc_id_to_link = (id) ->
       return collection(type).findOne(id)
 
     getByName: (args) ->
+      # console.log "GET BY NAME", args
       check @userId, NonEmptyString
       check args, ObjectWith
         name: NonEmptyString

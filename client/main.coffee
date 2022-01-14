@@ -222,6 +222,7 @@ BlackboardRouter = Backbone.Router.extend
     "": "BlackboardPage"
     "edit": "EditPage"
     "newPuzzle/:n/:l": "NewPuzzlePage"
+    "newPuzzleInRound/:r/:n/:l": "NewPuzzleInRoundPage"
     "newRound/:n/:l": "NewRoundPage"
     "rounds/:round": "RoundPage"
     "puzzles/:puzzle": "PuzzlePage"
@@ -248,8 +249,45 @@ BlackboardRouter = Backbone.Router.extend
         editing: undefined
 
   NewPuzzlePage: (n, l) ->
+    console.log "new puzzle", n, l
     Meteor.call 'newPuzzle', {name: decodeURIComponent(n), link: decodeURIComponent(l)}, (error,r) ->
       throw error if error
+    this.navigate "/", trigger: true
+
+  NewPuzzleInRoundPage: (r, n, l) ->
+    console.log "new puzzle in round", r, "called", n, "with link", l
+
+    roundName = decodeURIComponent(r)
+    console.log "looking for round name: ", roundName
+    Meteor.call 'getByName', {
+      who: "bla",
+      name: roundName,
+      optional_type: "rounds"
+    }, (error, r) ->
+      throw error if error
+      roundId = r.object._id
+
+      Meteor.call 'getByName', {
+        who: "bla",
+        name: roundName,
+        optional_type: "puzzles"
+      }, (error, m) ->
+        throw error if error
+        metaId = m.object._id
+
+        console.log r, m
+
+        console.log "got the round id: ", roundId
+        console.log "got the meta id: ", metaId
+
+        Meteor.call 'newPuzzle', {
+          name: decodeURIComponent(n),
+          link: decodeURIComponent(l),
+          round: roundId,
+          feedsInto: [metaId]
+        }, (error,r) ->
+          throw error if Error
+
     this.navigate "/", trigger: true
 
   NewRoundPage: (n, l) ->
