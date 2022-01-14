@@ -135,11 +135,13 @@ ensure = (drive, name, folder, settings) ->
           mimeType: settings.uploadMimeType
           body: settings.uploadTemplate()
     else
+      doc =
+        title: settings.titleFunc name
+        parents: [id: folder.id]
       doc = apiThrottle drive.files, 'copy',
         fileId: settings.templateFileId
-        json:
-          name: settings.titleFunc name
-          parents: [id: folder.id]
+        body: doc
+        resource: doc
   ensurePermissions drive, doc.id
   doc
 
