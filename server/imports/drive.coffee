@@ -54,7 +54,7 @@ apiThrottle = (base, name, params) ->
         await delay delays[ix]
         ix++
 
-ensurePermissions = (drive, id) ->
+ensurePermissions = (drive, id, changeOwner) ->
   # give permissions to both anyone with link and to the primary
   # service acount.  the service account must remain the owner in
   # order to be able to rename the folder
@@ -68,7 +68,7 @@ ensurePermissions = (drive, id) ->
     perms.push
       # edit permissions to codex account
       withLink: false
-      role: 'writer'
+      role: if changeOwner then 'owner' else 'writer'
       type: 'user'
       value: CODEX_ACCOUNT()
   resp = apiThrottle drive.permissions, 'list', fileId: id
@@ -122,7 +122,8 @@ ensure = (drive, name, folder, settings) ->
     maxResults: 1
   .items[0]
   unless doc?
-    if settings.templateFileId is undefined
+    createCopy = settings.templateFileId is undefined
+    if createCopy
       doc =
         title: settings.titleFunc name
         mimeType: settings.uploadMimeType
@@ -142,7 +143,7 @@ ensure = (drive, name, folder, settings) ->
         fileId: settings.templateFileId
         body: doc
         resource: doc
-  ensurePermissions drive, doc.id
+  ensurePermissions drive, doc.id, !createCopy
   doc
 
 awaitFolder = (drive, name, parent) ->
@@ -180,7 +181,7 @@ ensureFolder = (drive, name, parent) ->
     resource = apiThrottle drive.files, 'insert',
       resource: resource
   # give the new folder the right permissions
-  ensurePermissions drive, resource.id
+  ensurePermissions drive, resource.id, false
   resource
 
 awaitOrEnsureFolder = (drive, name, parent) ->
